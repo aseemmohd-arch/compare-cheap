@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CompareCart - Smart Shopping</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        header {
+            background: #14213d;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        header h1 {
+            font-size: 28px;
+        }
+
+        header h1 span {
+            color: #fca311;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #fca311;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #14213d, #284b82);
+            color: white;
+            text-align: center;
+            padding: 65px 20px;
+        }
+
+        .hero h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            color: #e0e7f1;
+            margin-bottom: 28px;
+            font-size: 16px;
+        }
+
+        .search-box {
+            max-width: 650px;
+            margin: auto;
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            padding: 6px;
+            gap: 8px;
+        }
+
+        .search-box input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            outline: none;
+            padding: 14px;
+            font-size: 16px;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background: #fca311;
+            color: #14213d;
+            padding: 13px 22px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #ffb52e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .section-heading h2 {
+            color: #14213d;
+            font-size: 26px;
+        }
+
+        #status {
+            color: #555;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 22px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+        }
+
+        .product-icon {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 58px;
+            background: #eef3fa;
+            border-radius: 8px;
+            margin-bottom: 18px;
+        }
+
+        .store {
+            display: inline-block;
+            background: #e7efff;
+            color: #244b91;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .product-card h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .price {
+            color: #16803c;
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .rating {
+            color: #e69b00;
+            margin-bottom: 18px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .product-actions a {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            padding: 11px 8px;
+            border-radius: 6px;
+            background: #14213d;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .product-actions a:hover {
+            background: #284b82;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 35px 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: #555;
+            grid-column: 1 / -1;
+        }
+
+        .error {
+            color: #b42318 !important;
+        }
+
+        .comparison-wrap {
+            overflow-x: auto;
+            background: white;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #14213d;
+            color: white;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 35px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 24px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: #14213d;
+        }
+
+        footer {
+            background: #14213d;
+            color: white;
+            text-align: center;
+            padding: 25px 15px;
+            margin-top: 55px;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                justify-content: center;
+                text-align: center;
+            }
+
+            nav a {
+                margin: 0 8px;
+            }
+
+            .hero h2 {
+                font-size: 28px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .search-box button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Compare<span>Cart</span></h1>
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="#products">Products</a>
+            <a href="#features">Features</a>
+            <a href="/docs" target="_blank">API</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h2>Shop Smart. Save More.</h2>
+        <p>Compare product prices and find the best available deal.</p>
+
+        <form class="search-box" id="searchForm">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search headphones, shoes, T-shirts..."
+                aria-label="Search products"
+                required
+            >
+            <button type="submit" id="searchButton">Search Products</button>
+        </form>
+    </section>
+
+    <main class="container">
+
+        <section id="products">
+            <div class="section-heading">
+                <h2 id="productsHeading">Available Products</h2>
+                <button type="button" id="showAllButton">Show All Products</button>
+            </div>
+
+            <p id="status" role="status">Loading products...</p>
+
+            <div class="products-grid" id="productsGrid"></div>
+
+            <div id="comparisonSection" hidden>
+                <h2 style="margin: 35px 0 15px;">Price Comparison</h2>
+
+                <div class="comparison-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Store</th>
+                                <th>Price</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="feature-card">
+                <div class="icon">🔎</div>
+                <h3>Easy Search</h3>
+                <p>Find products using the search box.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon">💰</div>
+                <h3>Compare Prices</h3>
+                <p>Compare prices returned by the API.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon">🛍️</div>
+                <h3>Shop Conveniently</h3>
+                <p>Open the available retailer link to view a product.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; <span id="year"></span> CompareCart. Shop smarter, save more.</p>
+    </footer>
+
+    <script>
+        const API_BASE = "/api";
+
+        const searchForm = document.getElementById("searchForm");
+        const searchInput = document.getElementById("searchInput");
+        const searchButton = document.getElementById("searchButton");
+        const showAllButton = document.getElementById("showAllButton");
+        const productsGrid = document.getElementById("productsGrid");
+        const statusMessage = document.getElementById("status");
+        const productsHeading = document.getElementById("productsHeading");
+        const comparisonSection = document.getElementById("comparisonSection");
+        const comparisonBody = document.getElementById("comparisonBody");
+
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        function escapeHTML(value) {
+            return String(value ?? "").replace(/[&<>"']/g, character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[character]);
+        }
+
+        function getProductIcon(name) {
+            const value = String(name || "").toLowerCase();
+
+            if (value.includes("headphone") || value.includes("earphone")) {
+                return "🎧";
+            }
+
+            if (value.includes("shoe") || value.includes("sneaker")) {
+                return "👟";
+            }
+
+            if (value.includes("shirt") || value.includes("clothing")
+                || value.includes("dress") || value.includes("t-shirt")) {
+                return "👕";
+            }
+
+            if (value.includes("phone") || value.includes("mobile")) {
+                return "📱";
+            }
+
+            if (value.includes("laptop") || value.includes("computer")) {
+                return "💻";
+            }
+
+            if (value.includes("watch")) {
+                return "⌚";
+            }
+
+            return "🛍️";
+        }
+
+        function getSafeLink(link) {
+            try {
+                const url = new URL(link, window.location.origin);
+
+                if (url.protocol === "https:" || url.protocol === "http:") {
+                    return url.href;
+                }
+            } catch (error) {
+                console.warn("Invalid product link:", error);
+            }
+
+            return null;
+        }
+
+        function renderProducts(products) {
+            productsGrid.innerHTML = "";
+            comparisonBody.innerHTML = "";
+            comparisonSection.hidden = true;
+
+            if (!Array.isArray(products) || products.length === 0) {
+                productsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No products found</h3>
+                        <p>Try searching for shoes, headphones, or T-shirts.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            products.forEach(product => {
+                const name = product.name || product.product_name || "Unnamed Product";
+                const store = product.store || "Unknown Store";
+                const price = Number(product.price);
+                const rating = Number(product.rating);
+                const safeLink = getSafeLink(product.link);
+
+                const priceText = Number.isFinite(price)
+                    ? "₹" + price.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2
+                    })
+                    : "Price unavailable";
+
+                const ratingText = Number.isFinite(rating) && rating > 0
+                    ? "⭐ " + rating.toFixed(1) + " / 5"
+                    : "Rating unavailable";
+
+                const card = document.createElement("article");
+                card.className = "product-card";
+
+                card.innerHTML = `
+                    <div class="product-icon">${getProductIcon(name)}</div>
+                    <span class="store">${escapeHTML(store)}</span>
+                    <h3>${escapeHTML(name)}</h3>
+                    <p class="price">${priceText}</p>
+                    <p class="rating">${ratingText}</p>
+                    <div class="product-actions">
+                        ${
+                            safeLink
+                            ? `<a href="${escapeHTML(safeLink)}"
+                                  target="_blank"
+                                  rel="noopener noreferrer">View Product</a>`
+                            : `<a href="#products">Link Unavailable</a>`
+                        }
+                    </div>
+                `;
+
+                productsGrid.appendChild(card);
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${escapeHTML(name)}</td>
+                    <td>${escapeHTML(store)}</td>
+                    <td>${escapeHTML(priceText)}</td>
+                    <td>${escapeHTML(ratingText)}</td>
+                `;
+
+                comparisonBody.appendChild(row);
+            });
+
+            comparisonSection.hidden = false;
+        }
+
+        async function loadAllProducts() {
+            productsHeading.textContent = "Available Products";
+            statusMessage.className = "";
+            statusMessage.textContent = "Loading products...";
+            productsGrid.innerHTML = "";
+            searchButton.disabled = true;
+            showAllButton.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/products`);
+
+                if (!response.ok) {
+                    throw new Error(`Server returned status ${response.status}`);
+                }
+
+                const products = await response.json();
+
+                renderProducts(products);
+
+                statusMessage.textContent = products.length
+                    ? `Showing ${products.length} products from your backend database.`
+                    : "No products are currently stored in the database.";
+            } catch (error) {
+                console.error("Failed to load products:", error);
+
+                statusMessage.className = "error";
+                statusMessage.textContent =
+                    "Could not load products. Make sure the FastAPI server is running and try refreshing the page.";
+            } finally {
+                searchButton.disabled = false;
+                showAllButton.disabled = false;
+            }
+        }
+
+        async function searchProducts(query) {
+            const cleanQuery = query.trim();
+
+            if (!cleanQuery) {
+                statusMessage.textContent = "Please enter a product name.";
+                return;
+            }
+
+            productsHeading.textContent =
+                `Search Results for "${cleanQuery}"`;
+
+            statusMessage.className = "";
+            statusMessage.textContent = "Searching for products...";
+            productsGrid.innerHTML = "";
+            searchButton.disabled = true;
+            showAllButton.disabled = true;
+
+            try {
+                const response = await fetch(
+                    `${API_BASE}/compare?query=${encodeURIComponent(cleanQuery)}`
+                );
+
+                if (!response.ok) {
+                    throw new Error(`Server returned status ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // The backend returns its product list in data.products.
+                const products = Array.isArray(data.products)
+                    ? data.products
+                    : Array.isArray(data.results)
+                        ? data.results
+                        : [];
+
+                renderProducts(products);
+
+                statusMessage.textContent = products.length
+                    ? `Found ${products.length} matching product(s). Prices and availability may change; verify them with the retailer.`
+                    : `No products found for "${cleanQuery}". Try another search.`;
+            } catch (error) {
+                console.error("Product search failed:", error);
+
+                statusMessage.className = "error";
+                statusMessage.textContent =
+                    "Search failed. Check that FastAPI is running at http://127.0.0.1:8000 and try again.";
+            } finally {
+                searchButton.disabled = false;
+                showAllButton.disabled = false;
+            }
+        }
+
+        searchForm.addEventListener("submit", event => {
+            event.preventDefault();
+            searchProducts(searchInput.value);
+        });
+
+        showAllButton.addEventListener("click", () => {
+            searchInput.value = "";
+            loadAllProducts();
+        });
+
+        // Load the sample products automatically when the page opens.
+        loadAllProducts();
+    </script>
+
+</body>
+</html>
+

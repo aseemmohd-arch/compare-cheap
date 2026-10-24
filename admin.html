@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Admin Panel - WormGPT E-Commerce</title>
+ <style>
+:root {
+ --primary: #2563eb;
+ --bg: #f1f5f9;
+ --card: #ffffff;
+ --text: #1e293b;
+ --danger: #ef4444;
+ }
+ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+.container { max-width: 1000px; margin: 0 auto; }
+ header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+ h1 { margin: 0; }
+.btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; color: white; }
+.btn-primary { background: var(--primary); }
+.btn-danger { background: var(--danger); }
+ 
+ /* Form */
+.form-card { background: var(--card); padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.form-row { display: flex; gap: 15px; margin-top: 15px; }
+ input, select { padding: 10px; border: 1px solid #ccc; border-radius: 6px; flex: 1; }
+ 
+ /* Table */
+ table { width: 100%; background: var(--card); border-collapse: collapse; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+ th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+ th { background: #e2e8f0; font-weight: 600; }
+.price { font-weight: bold; color: var(--primary); }
+.store-badge { background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
+ </style>
+</head>
+<body>
+
+<div class="container">
+ <header>
+ <h1>Admin Dashboard</h1>
+ <a href="index.html" class="btn btn-primary">Back to User Site</a>
+ </header>
+
+ <!-- Add Product Form -->
+ <div class="form-card">
+ <h3>Add New Product</h3>
+ <div class="form-row">
+ <input type="text" id="pName" placeholder="Product Name">
+ <select id="pStore">
+ <option value="Amazon">Amazon</option>
+ <option value="Flipkart">Flipkart</option>
+ <option value="Meesho">Meesho</option>
+ <option value="Ajio">Ajio</option>
+ <option value="Myntra">Myntra</option>
+ </select>
+ <input type="number" id="pPrice" placeholder="Price (₹)">
+ <button class="btn btn-primary" onclick="addProduct()">Add Product</button>
+ </div>
+ </div>
+
+ <!-- Product List -->
+ <table>
+ <thead>
+ <tr>
+ <th>ID</th>
+ <th>Product Name</th>
+ <th>Store</th>
+ <th>Price</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody id="productTableBody">
+ <!-- JS will populate this -->
+ </tbody>
+ </table>
+</div>
+
+<script>
+ async function loadProducts() {
+ const res = await fetch('http://localhost:8000/api/admin/products');
+ const products = await res.json();
+ const tbody = document.getElementById('productTableBody');
+ tbody.innerHTML = '';
+
+ products.forEach(p => {
+ const tr = document.createElement('tr');
+ tr.innerHTML = `
+ <td>${p.id}</td>
+ <td>${p.name}</td>
+ <td><span class="store-badge">${p.store}</span></td>
+ <td class="price">₹${p.price}</td>
+ <td><button class="btn btn-danger" onclick="deleteProduct(${p.id})">Delete</button></td>
+ `;
+ tbody.appendChild(tr);
+ });
+ }
+
+ async function addProduct() {
+ const name = document.getElementById('pName').value;
+ const store = document.getElementById('pStore').value;
+ const price = parseFloat(document.getElementById('pPrice').value);
+
+ if (!name || !price) return alert("Fill all fields");
+
+ const res = await fetch('http://localhost:8000/api/admin/add-product', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ store, name, price })
+ });
+
+ if (res.ok) {
+ loadProducts();
+ document.getElementById('pName').value = '';
+ document.getElementById('pPrice').value = '';
+ }
+ }
+
+ async function deleteProduct(id) {
+ if (!confirm("Delete this product?")) return;
+ await fetch(`http://localhost:8000/api/admin/delete-product/${id}`, { method: 'DELETE' });
+ loadProducts();
+ }
+
+ loadProducts();
+</script>
+
+</body>
+</html>
